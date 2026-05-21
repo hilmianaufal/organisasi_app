@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes floatSoft {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-14px);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        opacity: .18;
+        transform: scale(1);
+    }
+    50% {
+        opacity: .35;
+        transform: scale(1.08);
+    }
+}
+
+.animate-float-soft {
+    animation: floatSoft 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulseGlow 5s ease-in-out infinite;
+}
