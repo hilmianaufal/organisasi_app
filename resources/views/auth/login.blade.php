@@ -195,13 +195,6 @@
 
                         </button>
 
-                        {{-- REGISTER --}}
-                        <p class="auth-input text-center text-sm text-silver/70 pt-2">
-
-                            Belum punya akun?
-
-                        </p>
-
                     </form>
 
                 </div>
