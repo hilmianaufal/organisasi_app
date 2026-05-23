@@ -200,13 +200,6 @@
 
                             Belum punya akun?
 
-                            <a href="{{ route('register') }}"
-                                class="text-primary-light hover:text-primary font-semibold transition">
-
-                                Register
-
-                            </a>
-
                         </p>
 
                     </form>
