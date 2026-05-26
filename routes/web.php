@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AspirationController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\NewsController;
@@ -81,7 +82,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::resource('announcements', AnnouncementController::class);
     Route::get('/settings/general', [SettingController::class, 'edit'])
     ->name('settings.general');
-
+    Route::resource('categories', CategoryController::class);
     Route::put('/settings/general', [SettingController::class, 'update'])
     ->name('settings.general.update');  
     Route::post('/users', [AdminUserController::class, 'store'])

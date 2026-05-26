@@ -102,50 +102,6 @@
 
             </div>
 
-            {{-- HERO --}}
-            <div class="admin-card bg-dark-card/80 border border-primary/10 rounded-[2rem] p-6 md:p-8">
-
-                <h2 class="text-2xl font-extrabold mb-8">
-                    Hero Section
-                </h2>
-
-                <div class="space-y-6">
-
-                    <input
-                        type="text"
-                        name="hero_title"
-                        value="{{ old('hero_title', $setting->hero_title ?? '') }}"
-                        placeholder="Hero Title"
-                        class="w-full bg-dark border border-primary/10 rounded-2xl px-5 py-4 text-white">
-
-                    <textarea
-                        name="hero_subtitle"
-                        rows="5"
-                        placeholder="Hero Subtitle"
-                        class="w-full bg-dark border border-primary/10 rounded-2xl px-5 py-4 text-white">{{ old('hero_subtitle', $setting->hero_subtitle ?? '') }}</textarea>
-
-                    <div class="grid lg:grid-cols-2 gap-6">
-
-                        <input
-                            type="text"
-                            name="hero_button_text"
-                            value="{{ old('hero_button_text', $setting->hero_button_text ?? '') }}"
-                            placeholder="Button Text"
-                            class="w-full bg-dark border border-primary/10 rounded-2xl px-5 py-4 text-white">
-
-                        <input
-                            type="text"
-                            name="hero_button_link"
-                            value="{{ old('hero_button_link', $setting->hero_button_link ?? '') }}"
-                            placeholder="Button Link"
-                            class="w-full bg-dark border border-primary/10 rounded-2xl px-5 py-4 text-white">
-
-                    </div>
-
-                </div>
-
-            </div>
-
             {{-- KONTAK + VISI --}}
             <div class="grid lg:grid-cols-2 gap-8">
 

@@ -12,6 +12,12 @@
 @php
     $adminMenus = [
         ['label' => 'Dashboard', 'route' => '/dashboard', 'icon' => '⌂', 'active' => request()->is('dashboard')],
+        [
+                'label' => 'Kategori',
+                'route' => route('admin.categories.index'),
+                'icon' => '🏷️',
+                'active' => request()->is('admin/categories*')
+            ],
         ['label' => 'Berita', 'route' => route('admin.news.index'), 'icon' => '📰', 'active' => request()->is('admin/news*')],
         ['label' => 'Program', 'route' => route('admin.programs.index'), 'icon' => '📌', 'active' => request()->is('admin/programs*')],
         ['label' => 'Galeri', 'route' => route('admin.galleries.index'), 'icon' => '🖼️', 'active' => request()->is('admin/galleries*')],
@@ -51,20 +57,126 @@
                 </div>
             </a>
 
-            <div class="hidden xl:flex items-center gap-1 rounded-full bg-white/5 border border-primary/20 p-1 shadow-2xl">
-                @foreach($adminMenus as $menu)
-                    <a href="{{ $menu['route'] }}"
-                        class="group relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition duration-300
-                        {{ $menu['active']
-                            ? 'bg-gradient-to-r from-primary-light to-primary text-dark shadow-lg shadow-primary/20'
-                            : 'text-silver hover:bg-primary/10 hover:text-primary-light' }}">
-                        <span class="group-hover:scale-125 transition duration-300">
-                            {{ $menu['icon'] }}
-                        </span>
-                        <span>{{ $menu['label'] }}</span>
-                    </a>
-                @endforeach
+<div class="hidden xl:flex items-center gap-2">
+
+    {{-- MENU UTAMA --}}
+    <div class="flex items-center gap-1 rounded-full bg-white/5 border border-primary/20 p-1 shadow-2xl">
+
+        <a href="/dashboard"
+            class="group relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition duration-300
+            {{ request()->is('dashboard')
+                ? 'bg-gradient-to-r from-primary-light to-primary text-dark shadow-lg shadow-primary/20'
+                : 'text-silver hover:bg-primary/10 hover:text-primary-light' }}">
+
+            <span>⌂</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ route('admin.news.index') }}"
+            class="group relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition duration-300
+            {{ request()->is('admin/news*')
+                ? 'bg-gradient-to-r from-primary-light to-primary text-dark shadow-lg shadow-primary/20'
+                : 'text-silver hover:bg-primary/10 hover:text-primary-light' }}">
+
+            <span>📰</span>
+            <span>Berita</span>
+        </a>
+
+        <a href="{{ route('admin.programs.index') }}"
+            class="group relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition duration-300
+            {{ request()->is('admin/programs*')
+                ? 'bg-gradient-to-r from-primary-light to-primary text-dark shadow-lg shadow-primary/20'
+                : 'text-silver hover:bg-primary/10 hover:text-primary-light' }}">
+
+            <span>📌</span>
+            <span>Program</span>
+        </a>
+
+    </div>
+
+    {{-- DROPDOWN KONTEN --}}
+    <div class="relative" x-data="{ open: false }">
+
+        <button
+            @click="open = !open"
+            class="flex items-center gap-2 px-5 py-3 rounded-full bg-white/5 border border-primary/20 text-silver hover:text-primary-light transition">
+
+            📂 Konten
+            <span>⌄</span>
+        </button>
+
+        <div
+            x-show="open"
+            @click.outside="open = false"
+            x-transition
+            x-cloak
+            class="absolute right-0 mt-3 w-64 rounded-[2rem] bg-dark-card/95 backdrop-blur-2xl border border-primary/20 shadow-2xl overflow-hidden z-[9999]">
+
+            <div class="p-3 space-y-2">
+
+                <a href="{{ route('admin.categories.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 transition">
+                    🏷️ Kategori
+                </a>
+
+                <a href="{{ route('admin.galleries.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 transition">
+                    🖼️ Galeri
+                </a>
+
+                <a href="{{ route('admin.announcements.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 transition">
+                    📢 Pengumuman
+                </a>
+
+                <a href="{{ route('admin.aspirations.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 transition">
+                    💬 Aspirasi
+                </a>
+
             </div>
+
+        </div>
+
+    </div>
+
+    {{-- DROPDOWN ORGANISASI --}}
+    <div class="relative" x-data="{ open: false }">
+
+        <button
+            @click="open = !open"
+            class="flex items-center gap-2 px-5 py-3 rounded-full bg-white/5 border border-primary/20 text-silver hover:text-primary-light transition">
+
+            ⚙️ Organisasi
+            <span>⌄</span>
+        </button>
+
+        <div
+            x-show="open"
+            @click.outside="open = false"
+            x-transition
+            x-cloak
+            class="absolute right-0 mt-3 w-64 rounded-[2rem] bg-dark-card/95 backdrop-blur-2xl border border-primary/20 shadow-2xl overflow-hidden z-[9999]">
+
+            <div class="p-3 space-y-2">
+
+                <a href="{{ route('admin.members.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 transition">
+                    👥 Pengurus
+                </a>
+
+                <a href="{{ route('admin.settings.general') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 transition">
+                    ⚙️ Settings
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
             <div class="hidden xl:flex items-center gap-3">
                 <form method="POST" action="{{ route('logout') }}">
@@ -140,6 +252,6 @@
 <main class="pt-28">
     @yield('content')
 </main>
-
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>

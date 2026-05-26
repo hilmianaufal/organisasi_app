@@ -50,7 +50,14 @@
 
                                         <div>
                                             <div class="font-bold">{{ $item->title }}</div>
-                                            <div class="text-sm text-silver/60 line-clamp-1">{{ $item->excerpt }}</div>
+
+                                            <div class="mt-1 inline-block px-3 py-1 rounded-full bg-primary/10 text-primary-light text-xs font-semibold">
+                                                {{ $item->category->name ?? 'Tanpa Kategori' }}
+                                            </div>
+
+                                            <div class="text-sm text-silver/60 line-clamp-1 mt-1">
+                                                {{ $item->excerpt }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

@@ -61,7 +61,24 @@
                         <p class="text-red-400 text-sm mt-2">{{ $message }}</p>
                     @enderror
                 </div>
+                <div>
+                    <label class="block mb-3 text-silver/80">
+                        Kategori
+                    </label>
 
+                <select name="category_id"
+                    class="w-full bg-dark border border-primary/10 rounded-2xl px-5 py-4 text-white">
+
+                    <option value="">Pilih Kategori</option>
+
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}"
+                            {{ old('category_id', $news->category_id) == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+                </div>
                 <div>
                     <label class="block mb-3 text-silver/80">Tanggal Publish</label>
                     <input type="date" name="published_at"
