@@ -8,6 +8,28 @@ use Illuminate\Support\Str;
 
 class ProgramController extends Controller
 {
+    private function uploadPath(string $folder): string
+    {
+        if (app()->environment('local')) {
+            return public_path('uploads/' . $folder);
+        }
+
+        return $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $folder;
+    }
+
+    private function filePath(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        if (app()->environment('local')) {
+            return public_path($path);
+        }
+
+        return $_SERVER['DOCUMENT_ROOT'] . '/' . $path;
+    }
+
     public function index()
     {
         $programs = Program::latest()->get();
@@ -33,9 +55,17 @@ class ProgramController extends Controller
         $imagePath = null;
 
         if ($request->hasFile('image')) {
+            $uploadPath = $this->uploadPath('programs');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/programs'), $imageName);
+
+            $image->move($uploadPath, $imageName);
+
             $imagePath = 'uploads/programs/' . $imageName;
         }
 
@@ -70,13 +100,23 @@ class ProgramController extends Controller
         $imagePath = $program->image;
 
         if ($request->hasFile('image')) {
-            if ($program->image && file_exists(public_path($program->image))) {
-                unlink(public_path($program->image));
+            $uploadPath = $this->uploadPath('programs');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
+            $oldImage = $this->filePath($program->image);
+
+            if ($oldImage && file_exists($oldImage)) {
+                unlink($oldImage);
             }
 
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/programs'), $imageName);
+
+            $image->move($uploadPath, $imageName);
+
             $imagePath = 'uploads/programs/' . $imageName;
         }
 
@@ -95,8 +135,10 @@ class ProgramController extends Controller
 
     public function destroy(Program $program)
     {
-        if ($program->image && file_exists(public_path($program->image))) {
-            unlink(public_path($program->image));
+        $imagePath = $this->filePath($program->image);
+
+        if ($imagePath && file_exists($imagePath)) {
+            unlink($imagePath);
         }
 
         $program->delete();

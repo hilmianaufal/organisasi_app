@@ -8,6 +8,28 @@ use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
+    private function uploadPath(string $folder): string
+    {
+        if (app()->environment('local')) {
+            return public_path('uploads/' . $folder);
+        }
+
+        return $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $folder;
+    }
+
+    private function filePath(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        if (app()->environment('local')) {
+            return public_path($path);
+        }
+
+        return $_SERVER['DOCUMENT_ROOT'] . '/' . $path;
+    }
+
     public function index()
     {
         $members = Member::latest()->get();
@@ -33,9 +55,16 @@ class MemberController extends Controller
         $photoPath = null;
 
         if ($request->hasFile('photo')) {
+            $uploadPath = $this->uploadPath('members');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
             $photo = $request->file('photo');
             $photoName = time() . '.' . $photo->getClientOriginalExtension();
-            $photo->move(public_path('uploads/members'), $photoName);
+
+            $photo->move($uploadPath, $photoName);
 
             $photoPath = 'uploads/members/' . $photoName;
         }
@@ -70,13 +99,22 @@ class MemberController extends Controller
         $photoPath = $member->photo;
 
         if ($request->hasFile('photo')) {
-            if ($member->photo && file_exists(public_path($member->photo))) {
-                unlink(public_path($member->photo));
+            $uploadPath = $this->uploadPath('members');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
+            $oldPhoto = $this->filePath($member->photo);
+
+            if ($oldPhoto && file_exists($oldPhoto)) {
+                unlink($oldPhoto);
             }
 
             $photo = $request->file('photo');
             $photoName = time() . '.' . $photo->getClientOriginalExtension();
-            $photo->move(public_path('uploads/members'), $photoName);
+
+            $photo->move($uploadPath, $photoName);
 
             $photoPath = 'uploads/members/' . $photoName;
         }
@@ -95,8 +133,10 @@ class MemberController extends Controller
 
     public function destroy(Member $member)
     {
-        if ($member->photo && file_exists(public_path($member->photo))) {
-            unlink(public_path($member->photo));
+        $photoPath = $this->filePath($member->photo);
+
+        if ($photoPath && file_exists($photoPath)) {
+            unlink($photoPath);
         }
 
         $member->delete();
@@ -105,11 +145,11 @@ class MemberController extends Controller
             ->with('success', 'Pengurus berhasil dihapus.');
     }
 
-public function publicProfile()
-{
-    $members = Member::latest()->get();
-    $setting = Setting::first();
+    public function publicProfile()
+    {
+        $members = Member::latest()->get();
+        $setting = Setting::first();
 
-    return view('pages.profil', compact('members', 'setting'));
-}
+        return view('pages.profil', compact('members', 'setting'));
+    }
 }

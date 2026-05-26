@@ -9,6 +9,15 @@ use Illuminate\Support\Str;
 
 class NewsController extends Controller
 {
+    private function uploadPath(string $folder): string
+    {
+        if (app()->environment('local')) {
+            return public_path('uploads/' . $folder);
+        }
+
+        return $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $folder;
+    }
+
     public function index()
     {
         $news = News::with('category')->latest()->get();
@@ -37,9 +46,17 @@ class NewsController extends Controller
         $imagePath = null;
 
         if ($request->hasFile('image')) {
+            $uploadPath = $this->uploadPath('news');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/news'), $imageName);
+
+            $image->move($uploadPath, $imageName);
+
             $imagePath = 'uploads/news/' . $imageName;
         }
 
@@ -78,13 +95,24 @@ class NewsController extends Controller
         $imagePath = $news->image;
 
         if ($request->hasFile('image')) {
-            if ($news->image && file_exists(public_path($news->image))) {
-                unlink(public_path($news->image));
+            $uploadPath = $this->uploadPath('news');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
+            if ($news->image) {
+                $oldImage = $_SERVER['DOCUMENT_ROOT'] . '/' . $news->image;
+
+                if (file_exists($oldImage)) {
+                    unlink($oldImage);
+                }
             }
 
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/news'), $imageName);
+
+            $image->move($uploadPath, $imageName);
 
             $imagePath = 'uploads/news/' . $imageName;
         }
@@ -105,8 +133,14 @@ class NewsController extends Controller
 
     public function destroy(News $news)
     {
-        if ($news->image && file_exists(public_path($news->image))) {
-            unlink(public_path($news->image));
+        if ($news->image) {
+            $imagePath = app()->environment('local')
+                ? public_path($news->image)
+                : $_SERVER['DOCUMENT_ROOT'] . '/' . $news->image;
+
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
         }
 
         $news->delete();

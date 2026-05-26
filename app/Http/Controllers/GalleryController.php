@@ -7,6 +7,28 @@ use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
+    private function uploadPath(string $folder): string
+    {
+        if (app()->environment('local')) {
+            return public_path('uploads/' . $folder);
+        }
+
+        return $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $folder;
+    }
+
+    private function filePath(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        if (app()->environment('local')) {
+            return public_path($path);
+        }
+
+        return $_SERVER['DOCUMENT_ROOT'] . '/' . $path;
+    }
+
     public function index()
     {
         $galleries = Gallery::latest()->get();
@@ -28,9 +50,16 @@ class GalleryController extends Controller
             'activity_date' => 'nullable|date',
         ]);
 
+        $uploadPath = $this->uploadPath('galleries');
+
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
         $image = $request->file('image');
         $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path('uploads/galleries'), $imageName);
+
+        $image->move($uploadPath, $imageName);
 
         Gallery::create([
             'title' => $request->title,
@@ -60,13 +89,22 @@ class GalleryController extends Controller
         $imagePath = $gallery->image;
 
         if ($request->hasFile('image')) {
-            if ($gallery->image && file_exists(public_path($gallery->image))) {
-                unlink(public_path($gallery->image));
+            $uploadPath = $this->uploadPath('galleries');
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
+            $oldImage = $this->filePath($gallery->image);
+
+            if ($oldImage && file_exists($oldImage)) {
+                unlink($oldImage);
             }
 
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/galleries'), $imageName);
+
+            $image->move($uploadPath, $imageName);
 
             $imagePath = 'uploads/galleries/' . $imageName;
         }
@@ -84,8 +122,10 @@ class GalleryController extends Controller
 
     public function destroy(Gallery $gallery)
     {
-        if ($gallery->image && file_exists(public_path($gallery->image))) {
-            unlink(public_path($gallery->image));
+        $imagePath = $this->filePath($gallery->image);
+
+        if ($imagePath && file_exists($imagePath)) {
+            unlink($imagePath);
         }
 
         $gallery->delete();
